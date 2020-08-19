@@ -74,6 +74,18 @@ class Venue(db.Model):
             data[key] = getattr(self, key)
         return data
 
+    # set data from form data
+    def set_data(self, form_data):
+        keys = self.get_data_keys(False)
+        for key in keys:
+            if key == 'genres':
+                setattr(self, key, form_data.getlist('genres'))
+            elif key == 'seeking_talent':
+                setattr(self, key, form_data.get(
+                    'seeking_talent', '') == 'y')
+            else:
+                setattr(self, key, form_data.get(key))
+
     def get_past_shows(self):
         return list(filter(lambda show: show.start_time <= datetime.now(), self.shows))
 
@@ -125,6 +137,18 @@ class Artist(db.Model):
         for key in keys:
             data[key] = getattr(self, key)
         return data
+
+    # set data from form data
+    def set_data(self, form_data):
+        keys = self.get_data_keys(False)
+        for key in keys:
+            if key == 'genres':
+                setattr(self, key, form_data.getlist('genres'))
+            elif key == 'seeking_venue':
+                setattr(self, key, form_data.get(
+                    'seeking_venue', '') == 'y')
+            else:
+                setattr(self, key, form_data.get(key))
 
     def get_past_shows(self):
         return list(filter(lambda show: show.start_time <= datetime.now(), self.shows))
@@ -278,19 +302,8 @@ def create_venue_form():
 def create_venue_submission():
     error = False
     try:
-        data = request.form
         venue = Venue()
-        venue.name = data.get('name', '')
-        venue.city = data.get('city', '')
-        venue.state = data.get('state', '')
-        venue.address = data.get('address', '')
-        venue.phone = data.get('phone', '')
-        venue.genres = ','.join(data.getlist('genres'))
-        venue.image_link = data.get('image_link', '')
-        venue.website = data.get('website', '')
-        venue.facebook_link = data.get('facebook_link', '')
-        venue.seeking_talent = (data.get('seeking_talent', '') == 'y')
-        venue.seeking_description = data.get('seeking_description', '')
+        venue.set_data(form_data=request.form)
         db.session.add(venue)
         db.session.commit()
     except:
@@ -302,9 +315,10 @@ def create_venue_submission():
 
     if error:
         flash('An error occurred. Venue ' +
-              data.get('name', '') + ' could not be listed.')
+              request.form.get('name', '') + ' could not be listed.')
     else:
-        flash('Venue ' + data.get('name', '') + ' was successfully listed!')
+        flash('Venue ' + request.form.get('name', '') +
+              ' was successfully listed!')
 
     return render_template('pages/home.html')
 
@@ -423,20 +437,9 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-    data = request.form
     try:
-        data = request.form
         artist = Artist.query.get(artist_id)
-        artist.name = data.get('name', '')
-        artist.city = data.get('city', '')
-        artist.state = data.get('state', '')
-        artist.phone = data.get('phone', '')
-        artist.genres = ','.join(data.getlist('genres'))
-        artist.image_link = data.get('image_link', '')
-        artist.website = data.get('website', '')
-        artist.facebook_link = data.get('facebook_link', '')
-        artist.seeking_venue = (data.get('seeking_venue', '') == 'y')
-        artist.seeking_description = data.get('seeking_description', '')
+        artist.set_data(form_data=request.form)
         db.session.commit()
     except:
         db.session.rollback()
@@ -461,21 +464,9 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-    data = request.form
     try:
-        data = request.form
         venue = Venue.query.get(venue_id)
-        venue.name = data.get('name', '')
-        venue.city = data.get('city', '')
-        venue.state = data.get('state', '')
-        venue.address = data.get('address', '')
-        venue.phone = data.get('phone', '')
-        venue.genres = ','.join(data.getlist('genres'))
-        venue.image_link = data.get('image_link', '')
-        venue.website = data.get('website', '')
-        venue.facebook_link = data.get('facebook_link', '')
-        venue.seeking_talent = (data.get('seeking_talent', '') == 'y')
-        venue.seeking_description = data.get('seeking_description', '')
+        venue.set_data(form_data=request.form)
         db.session.commit()
     except:
         db.session.rollback()
@@ -499,18 +490,8 @@ def create_artist_form():
 def create_artist_submission():
     error = False
     try:
-        data = request.form
         artist = Artist()
-        artist.name = data.get('name', '')
-        artist.city = data.get('city', '')
-        artist.state = data.get('state', '')
-        artist.phone = data.get('phone', '')
-        artist.genres = ','.join(data.getlist('genres'))
-        artist.image_link = data.get('image_link', '')
-        artist.website = data.get('website', '')
-        artist.facebook_link = data.get('facebook_link', '')
-        artist.seeking_venue = (data.get('seeking_venue', '') == 'y')
-        artist.seeking_description = data.get('seeking_description', '')
+        artist.set_data(form_data=request.form)
         db.session.add(artist)
         db.session.commit()
     except:
@@ -522,9 +503,10 @@ def create_artist_submission():
 
     if error:
         flash('An error occurred. Artist ' +
-              data.get('name', '') + ' could not be listed.')
+              request.form.get('name', '') + ' could not be listed.')
     else:
-        flash('Artist ' + data.get('name', '') + ' was successfully listed!')
+        flash('Artist ' + request.form.get('name', '') +
+              ' was successfully listed!')
 
     return render_template('pages/home.html')
 
