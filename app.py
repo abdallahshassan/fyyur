@@ -445,29 +445,51 @@ def edit_artist_submission(artist_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
+    # get by id
+    venue = Venue.query.get(venue_id)
+
+    # form with setting default values
     form = VenueForm()
-    venue = {
-        "id": 1,
-        "name": "The Musical Hop",
-        "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
-        "address": "1015 Folsom Street",
-        "city": "San Francisco",
-        "state": "CA",
-        "phone": "123-123-1234",
-        "website": "https://www.themusicalhop.com",
-        "facebook_link": "https://www.facebook.com/TheMusicalHop",
-        "seeking_talent": True,
-        "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
-        "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60"
-    }
-    # TODO: populate form with values from venue with ID <venue_id>
+    form.name.default = venue.name
+    form.city.default = venue.city
+    form.state.default = venue.state
+    form.address.default = venue.address
+    form.phone.default = venue.phone
+    form.image_link.default = venue.image_link
+    form.genres.default = venue.genres.split(',')
+    form.website.default = venue.website
+    form.facebook_link.default = venue.facebook_link
+    form.seeking_talent.default = venue.seeking_talent
+    form.seeking_description.default = venue.seeking_description
+    form.process()
+
     return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-    # TODO: take values from the form submitted, and update existing
-    # venue record with ID <venue_id> using the new attributes
+    data = request.form
+    try:
+        data = request.form
+        venue = Venue.query.get(venue_id)
+        venue.name = data.get('name', '')
+        venue.city = data.get('city', '')
+        venue.state = data.get('state', '')
+        venue.address = data.get('address', '')
+        venue.phone = data.get('phone', '')
+        venue.genres = ','.join(data.getlist('genres'))
+        venue.image_link = data.get('image_link', '')
+        venue.website = data.get('website', '')
+        venue.facebook_link = data.get('facebook_link', '')
+        venue.seeking_talent = (data.get('seeking_talent', '') == 'y')
+        venue.seeking_description = data.get('seeking_description', '')
+        db.session.commit()
+    except:
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+
     return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist

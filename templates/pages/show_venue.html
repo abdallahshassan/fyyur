@@ -5,7 +5,10 @@
 	<div class="col-sm-6">
 		<h1 class="monospace">
 			{{ venue.name }}
-			<button id="delete-venue" data-id="{{ venue.id }}" class="btn btn-danger" style="float:right;">Delete</button>
+			<div style="float:right;">
+				<a href="/venues/{{ venue.id }}/edit" class="btn btn-primary">Edit</a>
+				<button id="delete-venue" data-id="{{ venue.id }}" class="btn btn-danger">Delete</button>
+			</div>
 		</h1>
 		<p class="subtitle">
 			ID: {{ venue.id }}
