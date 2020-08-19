@@ -39,7 +39,11 @@ class Venue(db.Model):
     address = db.Column(db.String(120))
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
+    website = db.Column(db.String(120))
     facebook_link = db.Column(db.String(120))
+    genres = db.Column(db.String)
+    seeking_talent = db.Column(db.Boolean)
+    seeking_description = db.Column(db.String)
     # relationships
     shows = db.relationship('Show', backref="venue", lazy=True)
 
@@ -57,7 +61,11 @@ class Artist(db.Model):
     phone = db.Column(db.String(120))
     genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
+    website = db.Column(db.String(120))
     facebook_link = db.Column(db.String(120))
+    genres = db.Column(db.String)
+    seeking_venue = db.Column(db.Boolean)
+    seeking_description = db.Column(db.String)
     # relationships
     shows = db.relationship('Show', backref="artist", lazy=True)
 
