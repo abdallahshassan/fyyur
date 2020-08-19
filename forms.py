@@ -134,34 +134,34 @@ class VenueForm(Form):
 
 class ArtistForm(Form):
     name = StringField(
-        'name', validators=[DataRequired()]
+        'Name', validators=[DataRequired()]
     )
     city = StringField(
-        'city', validators=[DataRequired()]
+        'City', validators=[DataRequired()]
     )
     state = SelectField(
-        'state', validators=[DataRequired()],
+        'State', validators=[DataRequired()],
         choices=STATES
     )
     phone = StringField(
-        'phone'
+        'Phone', validators=[Optional(), Regexp(r'\d{3}-\d{3}-\d{4}', message='Invalid Format')]
     )
     image_link = StringField(
-        'image_link', validators=[DataRequired(), URL()]
+        'Image Link', validators=[DataRequired(), URL()]
     )
     genres = SelectMultipleField(
-        'genres', validators=[DataRequired()],
+        'Genres', validators=[DataRequired()],
         choices=GENRES
     )
     website = StringField(
-        'website', validators=[URL()]
+        'Website', validators=[Optional(), URL()]
     )
     facebook_link = StringField(
-        'facebook_link', validators=[URL()]
+        'Facebook Link', validators=[Optional(), URL()]
     )
     seeking_venue = BooleanField(
-        'seeking_venue'
+        'Seeking Venue'
     )
     seeking_description = TextAreaField(
-        'seeking_description'
+        'Seeking Description'
     )

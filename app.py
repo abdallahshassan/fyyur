@@ -443,6 +443,13 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
+    # validate form
+    form = ArtistForm(request.form)
+    if not form.validate():
+        artist = Artist.query.get(artist_id)
+        return render_template('forms/edit_artist.html', form=form, artist=artist)
+
+    # edit artist
     try:
         artist = Artist.query.get(artist_id)
         artist.set_data(form_data=request.form)
@@ -501,6 +508,12 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
+    # validate form
+    form = ArtistForm(request.form)
+    if not form.validate():
+        return render_template('forms/new_artist.html', form=form)
+
+    # create artist
     error = False
     try:
         artist = Artist()
