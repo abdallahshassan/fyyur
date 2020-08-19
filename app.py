@@ -300,6 +300,12 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
+    # validate form
+    form = VenueForm(request.form)
+    if not form.validate():
+        return render_template('forms/new_venue.html', form=form)
+
+    # create venue
     error = False
     try:
         venue = Venue()
@@ -464,6 +470,13 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
+    # validate form
+    form = VenueForm(request.form)
+    if not form.validate():
+        venue = Venue.query.get(venue_id)
+        return render_template('forms/edit_venue.html', form=form, venue=venue)
+
+    # edit venue
     try:
         venue = Venue.query.get(venue_id)
         venue.set_data(form_data=request.form)

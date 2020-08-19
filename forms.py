@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask_wtf import Form
 from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField, TextAreaField, SubmitField
-from wtforms.validators import DataRequired, AnyOf, URL, Regexp
+from wtforms.validators import DataRequired, AnyOf, URL, Regexp, Optional
 
 STATES = [
     ('AL', 'AL'),
@@ -96,39 +96,39 @@ class ShowForm(Form):
 
 class VenueForm(Form):
     name = StringField(
-        'name', validators=[DataRequired()]
+        'Name', validators=[DataRequired()]
     )
     city = StringField(
-        'city', validators=[DataRequired()]
+        'City', validators=[DataRequired()]
     )
     state = SelectField(
-        'state', validators=[DataRequired()],
+        'State', validators=[DataRequired()],
         choices=STATES
     )
     address = StringField(
-        'address'
+        'Address'
     )
     phone = StringField(
-        'phone', validators=[Regexp(r'\d{3}-\d{3}-\d{4}', message='Invalid Format')]
+        'Phone', validators=[Optional(), Regexp(r'\d{3}-\d{3}-\d{4}', message='Invalid Format')]
     )
     image_link = StringField(
-        'image_link', validators=[DataRequired(), URL()]
+        'Image Link', validators=[DataRequired(), URL()]
     )
     genres = SelectMultipleField(
-        'genres', validators=[DataRequired()],
+        'Genres', validators=[DataRequired()],
         choices=GENRES
     )
     website = StringField(
-        'website', validators=[URL()]
+        'Website', validators=[Optional(), URL()]
     )
     facebook_link = StringField(
-        'facebook_link', validators=[URL()]
+        'Facebook Link', validators=[Optional(), URL()]
     )
     seeking_talent = BooleanField(
-        'seeking_talent'
+        'Seeking Talent'
     )
     seeking_description = TextAreaField(
-        'seeking_description'
+        'Seeking Talent Description'
     )
 
 
