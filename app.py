@@ -12,7 +12,7 @@ from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
-from forms import *
+from forms import VenueForm, ArtistForm, ShowForm
 from datetime import datetime
 import sys
 #----------------------------------------------------------------------------#
