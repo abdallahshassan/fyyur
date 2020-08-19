@@ -31,7 +31,7 @@ migrate = Migrate(app, db)
 
 class Venue(db.Model):
     __tablename__ = 'Venue'
-
+    # columns
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     city = db.Column(db.String(120))
@@ -40,12 +40,16 @@ class Venue(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    # relationships
     shows = db.relationship('Show', backref="venue", lazy=True)
+
+    def __repr__(self):
+        return f'<Venue id: {self.id}, name: {self.name}, city: {self.city}, state: {self.state}>'
 
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
-
+    # columns
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     city = db.Column(db.String(120))
@@ -54,17 +58,24 @@ class Artist(db.Model):
     genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    # relationships
     shows = db.relationship('Show', backref="artist", lazy=True)
+
+    def __repr__(self):
+        return f'<Artist id: {self.id}, name: {self.name}, city: {self.city}, state: {self.state}>'
 
 
 class Show(db.Model):
     __tablename__ = 'Show'
-
+    # columns
     id = db.Column(db.Integer, primary_key=True)
     venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), nullable=False)
     artist_id = db.Column(db.Integer, db.ForeignKey(
         'Artist.id'), nullable=False)
     start_time = db.Column(db.DateTime(), nullable=False)
+
+    def __repr__(self):
+        return f'<Show id: {self.id}, venue_id: {self.venue_id}, artist_id: {self.artist_id}, start_time: {self.start_time}>'
 
 #----------------------------------------------------------------------------#
 # Filters.
