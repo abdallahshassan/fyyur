@@ -568,13 +568,18 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
+    # validate form
+    form = ShowForm(request.form)
+    if not form.validate():
+        return render_template('forms/new_show.html', form=form)
+
+    # create show
     error = False
     try:
-        data = request.form
         show = Show()
-        show.venue_id = data.get('venue_id', '')
-        show.artist_id = data.get('artist_id', '')
-        show.start_time = data.get('start_time', '')
+        show.venue_id = request.form.get('venue_id', '')
+        show.artist_id = request.form.get('artist_id', '')
+        show.start_time = request.form.get('start_time', '')
         db.session.add(show)
         db.session.commit()
     except:

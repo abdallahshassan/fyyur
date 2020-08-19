@@ -82,14 +82,17 @@ GENRES = [
 
 class ShowForm(Form):
     artist_id = StringField(
-        'artist_id'
+        'Artist Id',
+        validators=[DataRequired()]
     )
     venue_id = StringField(
-        'venue_id'
+        'Venue Id',
+        validators=[DataRequired()]
     )
     start_time = DateTimeField(
-        'start_time',
+        'Start Time',
         validators=[DataRequired()],
+        format='%Y-%m-%d %H:%M',
         default=datetime.today()
     )
 
