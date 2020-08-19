@@ -43,11 +43,36 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500), nullable=False)
     website = db.Column(db.String(120))
     facebook_link = db.Column(db.String(120))
-    genres = db.Column(db.String, nullable=False)
+    _genres = db.Column(db.String, name="genres", nullable=False)
     seeking_talent = db.Column(db.Boolean)
     seeking_description = db.Column(db.String)
     # relationships
     shows = db.relationship('Show', backref="venue", lazy=True)
+
+    # genres property
+    @property
+    def genres(self):
+        return self._genres.split(',')
+
+    # genres property setter
+    @genres.setter
+    def genres(self, value):
+        self._genres = ','.join(value)
+
+    # get columns names in list
+    def get_data_keys(self, include_id=True):
+        keys = self.__table__.columns.keys()
+        if not include_id:
+            keys.remove('id')
+        return keys
+
+    # get get data dict with columns names and values
+    def get_data(self, include_id=True):
+        keys = self.get_data_keys(include_id)
+        data = {}
+        for key in keys:
+            data[key] = getattr(self, key)
+        return data
 
     def get_past_shows(self):
         return list(filter(lambda show: show.start_time <= datetime.now(), self.shows))
@@ -70,11 +95,36 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500), nullable=False)
     website = db.Column(db.String(120))
     facebook_link = db.Column(db.String(120))
-    genres = db.Column(db.String, nullable=False)
+    _genres = db.Column(db.String, name="genres", nullable=False)
     seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String)
     # relationships
     shows = db.relationship('Show', backref="artist", lazy=True)
+
+    # genres property
+    @property
+    def genres(self):
+        return self._genres.split(',')
+
+    # genres property setter
+    @genres.setter
+    def genres(self, value):
+        self._genres = ','.join(value)
+
+    # get columns names in list
+    def get_data_keys(self, include_id=True):
+        keys = self.__table__.columns.keys()
+        if not include_id:
+            keys.remove('id')
+        return keys
+
+    # get get data dict with columns names and values
+    def get_data(self, include_id=True):
+        keys = self.get_data_keys(include_id)
+        data = {}
+        for key in keys:
+            data[key] = getattr(self, key)
+        return data
 
     def get_past_shows(self):
         return list(filter(lambda show: show.start_time <= datetime.now(), self.shows))
@@ -186,26 +236,8 @@ def show_venue(venue_id):
     # get by id
     venue = Venue.query.get(venue_id)
 
-    # direct data from columns
-    data = {
-        "id": venue.id,
-        "name": venue.name,
-        "address": venue.address,
-        "city": venue.city,
-        "state": venue.state,
-        "phone": venue.phone,
-        "website": venue.website,
-        "facebook_link": venue.facebook_link,
-        "seeking_talent": venue.seeking_talent,
-        "image_link": venue.image_link
-    }
-
-    # genres list
-    data['genres'] = venue.genres.split(',')
-
-    # seeking description if seeking_talent is true
-    if venue.seeking_talent:
-        data['seeking_description'] = venue.seeking_description
+    # venue data
+    data = venue.get_data()
 
     # show to dict
     def get_show_dict(show):
@@ -345,25 +377,8 @@ def show_artist(artist_id):
     # get by id
     artist = Artist.query.get(artist_id)
 
-    # direct data from columns
-    data = {
-        "id": artist.id,
-        "name": artist.name,
-        "city": artist.city,
-        "state": artist.state,
-        "phone": artist.phone,
-        "website": artist.website,
-        "facebook_link": artist.facebook_link,
-        "seeking_venue": artist.seeking_venue,
-        "image_link": artist.image_link
-    }
-
-    # genres list
-    data['genres'] = artist.genres.split(',')
-
-    # seeking description if seeking_venue is true
-    if artist.seeking_venue:
-        data['seeking_description'] = artist.seeking_description
+    # artist data
+    data = artist.get_data()
 
     # show to dict
     def get_show_dict(show):
@@ -400,18 +415,7 @@ def edit_artist(artist_id):
     artist = Artist.query.get(artist_id)
 
     # form with setting default values
-    data = {
-        "name": artist.name,
-        "city": artist.city,
-        "state": artist.state,
-        "phone": artist.phone,
-        "image_link": artist.image_link,
-        "genres": artist.genres.split(','),
-        "website": artist.website,
-        "facebook_link": artist.facebook_link,
-        "seeking_venue": artist.seeking_venue,
-        "seeking_description": artist.seeking_description,
-    }
+    data = artist.get_data(include_id=False)
     form = ArtistForm(data=data)
 
     return render_template('forms/edit_artist.html', form=form, artist=artist)
@@ -449,19 +453,7 @@ def edit_venue(venue_id):
     venue = Venue.query.get(venue_id)
 
     # form with setting default values
-    data = {
-        "name": venue.name,
-        "city": venue.city,
-        "state": venue.state,
-        "address": venue.address,
-        "phone": venue.phone,
-        "image_link": venue.image_link,
-        "genres": venue.genres.split(','),
-        "website": venue.website,
-        "facebook_link": venue.facebook_link,
-        "seeking_talent": venue.seeking_talent,
-        "seeking_description": venue.seeking_description,
-    }
+    data = venue.get_data(include_id=False)
     form = VenueForm(data=data)
 
     return render_template('forms/edit_venue.html', form=form, venue=venue)

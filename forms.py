@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask_wtf import Form
-from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField, TextAreaField
-from wtforms.validators import DataRequired, AnyOf, URL
+from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField, TextAreaField, SubmitField
+from wtforms.validators import DataRequired, AnyOf, URL, Regexp
 
 STATES = [
     ('AL', 'AL'),
@@ -109,7 +109,7 @@ class VenueForm(Form):
         'address'
     )
     phone = StringField(
-        'phone'
+        'phone', validators=[Regexp(r'\d{3}-\d{3}-\d{4}', message='Invalid Format')]
     )
     image_link = StringField(
         'image_link', validators=[DataRequired(), URL()]
