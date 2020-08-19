@@ -48,6 +48,12 @@ class Venue(db.Model):
     # relationships
     shows = db.relationship('Show', backref="venue", lazy=True)
 
+    def get_past_shows(self):
+        return list(filter(lambda show: show.start_time <= datetime.now(), self.shows))
+
+    def get_upcoming_shows(self):
+        return list(filter(lambda show: show.start_time > datetime.now(), self.shows))
+
     def __repr__(self):
         return f'<Venue id: {self.id}, name: {self.name}, city: {self.city}, state: {self.state}>'
 
@@ -132,7 +138,7 @@ def venues():
             area_data.append({
                 "id": venue.id,
                 "name": venue.name,
-                "num_upcoming_shows": 0  # TODO: get upcoming shows count
+                "num_upcoming_shows": len(venue.get_upcoming_shows())
             })
         # add area city, state & venues data to final data
         data.append({
@@ -159,7 +165,7 @@ def search_venues():
         data.append({
             "id": venue.id,
             "name": venue.name,
-            "num_upcoming_shows": 0  # TODO: get upcoming shows count
+            "num_upcoming_shows": len(venue.get_upcoming_shows())
         })
 
     response = {
@@ -205,16 +211,14 @@ def show_venue(venue_id):
         }
 
     # past_shows
-    past_shows = list(filter(lambda show: show.start_time <=
-                             datetime.now(), venue.shows))
+    past_shows = venue.get_past_shows()
     data['past_shows_count'] = len(past_shows)
     data['past_shows'] = []
     for show in past_shows:
         data['past_shows'].append(get_show_dict(show))
 
     # upcoming shows
-    upcoming_shows = list(
-        filter(lambda show: show.start_time > datetime.now(), venue.shows))
+    upcoming_shows = venue.get_upcoming_shows()
     data['upcoming_shows_count'] = len(upcoming_shows)
     data['upcoming_shows'] = []
     for show in upcoming_shows:
