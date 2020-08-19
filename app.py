@@ -207,7 +207,7 @@ def show_venue(venue_id):
             "artist_id": show.artist.id,
             "artist_name": show.artist.name,
             "artist_image_link": show.artist.image_link,
-            "start_time": show.start_time
+            "start_time": show.start_time.strftime("%Y-%m-%d %H:%M:%S")
         }
 
     # past_shows
