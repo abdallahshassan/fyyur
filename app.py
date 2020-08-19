@@ -397,28 +397,48 @@ def show_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
+    # get by id
+    artist = Artist.query.get(artist_id)
+
+    # form with setting default values
     form = ArtistForm()
-    artist = {
-        "id": 4,
-        "name": "Guns N Petals",
-        "genres": ["Rock n Roll"],
-        "city": "San Francisco",
-        "state": "CA",
-        "phone": "326-123-5000",
-        "website": "https://www.gunsnpetalsband.com",
-        "facebook_link": "https://www.facebook.com/GunsNPetals",
-        "seeking_venue": True,
-        "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
-        "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
-    }
-    # TODO: populate form with fields from artist with ID <artist_id>
+    form.name.default = artist.name
+    form.city.default = artist.city
+    form.state.default = artist.state
+    form.phone.default = artist.phone
+    form.image_link.default = artist.image_link
+    form.genres.default = artist.genres.split(',')
+    form.website.default = artist.website
+    form.facebook_link.default = artist.facebook_link
+    form.seeking_venue.default = artist.seeking_venue
+    form.seeking_description.default = artist.seeking_description
+    form.process()
+
     return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-    # TODO: take values from the form submitted, and update existing
-    # artist record with ID <artist_id> using the new attributes
+    data = request.form
+    try:
+        data = request.form
+        artist = Artist.query.get(artist_id)
+        artist.name = data.get('name', '')
+        artist.city = data.get('city', '')
+        artist.state = data.get('state', '')
+        artist.phone = data.get('phone', '')
+        artist.genres = ','.join(data.getlist('genres'))
+        artist.image_link = data.get('image_link', '')
+        artist.website = data.get('website', '')
+        artist.facebook_link = data.get('facebook_link', '')
+        artist.seeking_venue = (data.get('seeking_venue', '') == 'y')
+        artist.seeking_description = data.get('seeking_description', '')
+        db.session.commit()
+    except:
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
 
     return redirect(url_for('show_artist', artist_id=artist_id))
 
