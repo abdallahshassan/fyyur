@@ -5,7 +5,7 @@
 import json
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for, abort
+from flask import Flask, render_template, request, Response, flash, redirect, url_for, abort, jsonify
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -286,7 +286,8 @@ def show_venue(venue_id):
     for show in upcoming_shows:
         data['upcoming_shows'].append(get_show_dict(show))
 
-    return render_template('pages/show_venue.html', venue=data)
+    showForm = ShowForm()
+    return render_template('pages/show_venue.html', venue=data, showForm=showForm)
 
 #  Create Venue
 #  ----------------------------------------------------------------
@@ -369,6 +370,7 @@ def artists():
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
     search_term = request.form.get('search_term', '')
+    result_format = request.form.get('result_format', '')
 
     # case insensitive search
     artists = Artist.query.filter(
@@ -388,6 +390,9 @@ def search_artists():
         "count": count,
         "data": data
     }
+
+    if result_format == 'json':
+        return jsonify(response)
 
     return render_template('pages/search_artists.html', results=response, search_term=search_term)
 
@@ -561,8 +566,11 @@ def shows():
 
 @app.route('/shows/create')
 def create_shows():
-    # renders form. do not touch.
-    form = ShowForm()
+    data = {
+        'venue_id': request.args.get('venue_id', ''),
+        'artist_id': request.args.get('artist_id', '')
+    }
+    form = ShowForm(data=data)
     return render_template('forms/new_show.html', form=form)
 
 

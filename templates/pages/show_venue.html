@@ -28,10 +28,12 @@
 			<i class="fas fa-phone-alt"></i> {% if venue.phone %}{{ venue.phone }}{% else %}No Phone{% endif %}
 		</p>
 		<p>
-			<i class="fas fa-link"></i> {% if venue.website %}<a href="{{ venue.website }}" target="_blank">{{ venue.website }}</a>{% else %}No Website{% endif %}
+			<i class="fas fa-link"></i> {% if venue.website %}<a href="{{ venue.website }}"
+				target="_blank">{{ venue.website }}</a>{% else %}No Website{% endif %}
 		</p>
 		<p>
-			<i class="fab fa-facebook-f"></i> {% if venue.facebook_link %}<a href="{{ venue.facebook_link }}" target="_blank">{{ venue.facebook_link }}</a>{% else %}No Facebook Link{% endif %}
+			<i class="fab fa-facebook-f"></i> {% if venue.facebook_link %}<a href="{{ venue.facebook_link }}"
+				target="_blank">{{ venue.facebook_link }}</a>{% else %}No Facebook Link{% endif %}
 		</p>
 		{% if venue.seeking_talent %}
 		<div class="seeking">
@@ -40,18 +42,39 @@
 				<i class="fas fa-quote-left"></i> {{ venue.seeking_description }} <i class="fas fa-quote-right"></i>
 			</div>
 		</div>
-		{% else %}	
+		{% else %}
 		<p class="not-seeking">
 			<i class="fas fa-moon"></i> Not currently seeking talent
 		</p>
 		{% endif %}
+		<form id="create-show-form" action="/shows/create" method="POST">
+			<input type="hidden" name="venue_id" value="{{ venue.id }}">
+			<div class="panel panel-default" style="margin-top: 10px;">
+				<div class="panel-heading">Choose an artist for creating a show</div>
+				<div class="panel-body">
+					<input class="form-control" type="search" id="venue-search-artist" placeholder="Find an artist"
+						aria-label="Search">
+					<div id="venue-search-artist-results">
+					</div>
+				</div>
+				<div class="panel-footer">
+					<div class="form-group">
+						<label for="start_time">Start Time</label>
+						{{ showForm.start_time(class_ = 'form-control', placeholder='YYYY-MM-DD HH:MM', autofocus = true) }}
+					</div>
+					{{ showForm.csrf_token }}
+					<button type="submit" class="btn btn-primary">Create Show</button>
+				</div>
+			</div>
+		</form>
 	</div>
 	<div class="col-sm-6">
 		<img src="{{ venue.image_link }}" alt="Venue Image" />
 	</div>
 </div>
 <section>
-	<h2 class="monospace">{{ venue.upcoming_shows_count }} Upcoming {% if venue.upcoming_shows_count == 1 %}Show{% else %}Shows{% endif %}</h2>
+	<h2 class="monospace">{{ venue.upcoming_shows_count }} Upcoming
+		{% if venue.upcoming_shows_count == 1 %}Show{% else %}Shows{% endif %}</h2>
 	<div class="row">
 		{%for show in venue.upcoming_shows %}
 		<div class="col-sm-4">
@@ -65,7 +88,8 @@
 	</div>
 </section>
 <section>
-	<h2 class="monospace">{{ venue.past_shows_count }} Past {% if venue.past_shows_count == 1 %}Show{% else %}Shows{% endif %}</h2>
+	<h2 class="monospace">{{ venue.past_shows_count }} Past
+		{% if venue.past_shows_count == 1 %}Show{% else %}Shows{% endif %}</h2>
 	<div class="row">
 		{%for show in venue.past_shows %}
 		<div class="col-sm-4">
@@ -80,17 +104,59 @@
 </section>
 
 <script>
-	document.getElementById('delete-venue').onclick = function() {
+	document.getElementById('delete-venue').onclick = function () {
 		fetch('/venues/' + this.dataset.id, {
 			method: "DELETE",
-		}).then(function() {
+		}).then(function () {
 			alert("Venue successfully deleted!");
 			window.location.href = '/';
-		}).catch(function(error) {
+		}).catch(function (error) {
 			alert("Error occurred, Could not delete the venue.");
 		});
+	};
+
+	var artistSearchInput = document.getElementById('venue-search-artist');
+	artistSearchInput.oninput = function () {
+		const formData = new FormData();
+		formData.append('search_term', this.value);
+		formData.append('result_format', 'json');
+		fetch('/artists/search', {
+			method: "POST",
+			body: formData
+		}).then(function (response) {
+			return response.json();
+		}).then(function (jsonResponse) {
+			var resultsContainer = document.getElementById('venue-search-artist-results');
+			resultsContainer.innerHTML = '';
+			jsonResponse.data.forEach(function (result) {
+				var radio = document.createElement('div');
+				radio.class = 'radio';
+				radio.innerHTML = '<label><input type="radio" name="artist_id" value="' + result.id + '"> ' + result.name + '</label>';
+				resultsContainer.appendChild(radio);
+			});
+		}).catch(function (error) {
+			alert("Error occurred, Could not search." + error);
+		});
+	};
+	artistSearchInput.dispatchEvent(new Event('input', {
+		bubbles: true,
+		cancelable: true,
+	}));
+
+	document.getElementById('create-show-form').onsubmit = function (e) {
+		var radios = document.getElementsByName('artist_id');
+		var oneIsSelected = false;
+		for (var i = 0, length = radios.length; i < length; i++) {
+			if (radios[i].checked) {
+				oneIsSelected = true;
+				break;
+			}
+		}
+		if (!oneIsSelected) {
+			e.preventDefault();
+			alert('Please select an artist first');
+		}
 	};
 </script>
 
 {% endblock %}
-
