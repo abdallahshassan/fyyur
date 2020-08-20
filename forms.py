@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask_wtf import Form
-from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField, TextAreaField, SubmitField
-from wtforms.validators import DataRequired, AnyOf, URL, Regexp, Optional
+from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField, TextAreaField
+from wtforms.validators import DataRequired, URL, Regexp, Optional
 
 STATES = [
     ('AL', 'AL'),
