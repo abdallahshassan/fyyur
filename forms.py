@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, URL, Regexp, Optional
 
@@ -80,7 +80,7 @@ GENRES = [
 ]
 
 
-class ShowForm(Form):
+class ShowForm(FlaskForm):
     artist_id = StringField(
         'Artist Id',
         validators=[DataRequired()]
@@ -97,7 +97,7 @@ class ShowForm(Form):
     )
 
 
-class VenueForm(Form):
+class VenueForm(FlaskForm):
     name = StringField(
         'Name', validators=[DataRequired()]
     )
@@ -135,7 +135,7 @@ class VenueForm(Form):
     )
 
 
-class ArtistForm(Form):
+class ArtistForm(FlaskForm):
     name = StringField(
         'Name', validators=[DataRequired()]
     )
