@@ -20,7 +20,8 @@ class Venue(db.Model):
     seeking_talent = db.Column(db.Boolean)
     seeking_description = db.Column(db.String)
     # relationships
-    shows = db.relationship('Show', backref="venue", lazy=True)
+    shows = db.relationship('Show', backref="venue",
+                            cascade="all, delete-orphan", lazy=True)
 
     # genres property
     @property
@@ -84,7 +85,8 @@ class Artist(db.Model):
     seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String)
     # relationships
-    shows = db.relationship('Show', backref="artist", lazy=True)
+    shows = db.relationship('Show', backref="artist",
+                            cascade="all, delete-orphan", lazy=True)
 
     # genres property
     @property
